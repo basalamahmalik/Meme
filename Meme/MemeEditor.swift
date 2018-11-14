@@ -1,6 +1,6 @@
 //
-//  ViewController.swift
-//  Meme
+//  MemeEditor.swift
+//
 //
 //  Created by Malik Basalamah on 06/03/1440 AH.
 //  Copyright © 1440 Malik Basalamah. All rights reserved.
@@ -18,7 +18,7 @@ class MemeEditor: UIViewController, UIImagePickerControllerDelegate,UINavigation
     @IBOutlet weak var albumButton: UIBarButtonItem!
     @IBOutlet weak var shareButton: UIBarButtonItem!
     @IBOutlet weak var cancelButton: UIBarButtonItem!
-    @IBOutlet weak var toolBar: NSLayoutConstraint!
+    @IBOutlet weak var toolBar: UIToolbar!
     @IBOutlet weak var navigationBar: UINavigationBar!
     
     // define proparties
@@ -37,25 +37,10 @@ class MemeEditor: UIViewController, UIImagePickerControllerDelegate,UINavigation
     override func viewDidLoad() {
         super.viewDidLoad()
         
+    
+        configureTextFields(topTextField,with: "TOP")
+        configureTextFields(bottomTextField, with: "BOTTOM")
         
-        topTextField.defaultTextAttributes = memeTextAttributes
-        bottomTextField.defaultTextAttributes = memeTextAttributes
-        
-        
-        topTextField.delegate = self;
-        bottomTextField.delegate = self;
-        
-        topTextField.text = "TOP"
-        topTextField.textAlignment = NSTextAlignment.center
-        topTextField.adjustsFontSizeToFitWidth = true
-        topTextField.isUserInteractionEnabled = false
-
-        
-        bottomTextField.text = "BOTTOM"
-        bottomTextField.textAlignment = NSTextAlignment.center
-        bottomTextField.adjustsFontSizeToFitWidth = true
-        bottomTextField.isUserInteractionEnabled = false
-
         // Disable the Cancel Button
         shareButton.isEnabled = false
         cancelButton.isEnabled = false
@@ -133,7 +118,6 @@ class MemeEditor: UIViewController, UIImagePickerControllerDelegate,UINavigation
         if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
             imageViewer.contentMode = .scaleAspectFit
             imageViewer.image = image
-            save()
         }
         dismiss(animated: true,completion: nil)
         topTextField.isUserInteractionEnabled = true
@@ -149,6 +133,16 @@ class MemeEditor: UIViewController, UIImagePickerControllerDelegate,UINavigation
         cancelButton.isEnabled = true
     }
     
+    func configureTextFields(_ textField: UITextField, with defaultText: String) {
+        // TODO:- code to configure the textField
+        textField.defaultTextAttributes = memeTextAttributes
+        textField.delegate = self;
+        textField.text = defaultText
+        textField.textAlignment = NSTextAlignment.center
+        textField.adjustsFontSizeToFitWidth = true
+        textField.isUserInteractionEnabled = false
+        }
+    
     // #MARK Following code dealing with the Image
     
     // This func is to Save the image.
@@ -161,9 +155,8 @@ class MemeEditor: UIViewController, UIImagePickerControllerDelegate,UINavigation
     // This func is to modify the image
     func generateMemedImage() -> UIImage {
         //  Hide toolbar and navbar
-        self.navigationController?.setToolbarHidden(true, animated: true)
-        self.navigationController?.setNavigationBarHidden(true, animated: true)
-        
+        toolBar.isHidden = true
+        navigationBar.isHidden = true
         // Render view to an image
         UIGraphicsBeginImageContext(self.view.frame.size)
         view.drawHierarchy(in: self.view.frame, afterScreenUpdates: true)
@@ -171,9 +164,9 @@ class MemeEditor: UIViewController, UIImagePickerControllerDelegate,UINavigation
         UIGraphicsEndImageContext()
         
         //Show toolbar and navbar
-        self.navigationController?.setToolbarHidden(false, animated: true)
-        self.navigationController?.setNavigationBarHidden(false, animated: true)
-        
+        toolBar.isHidden = false
+        navigationBar.isHidden = false
+
         return memedImage
     }
     
@@ -200,12 +193,17 @@ class MemeEditor: UIViewController, UIImagePickerControllerDelegate,UINavigation
     }
     
     @objc func keyboardWillShow(_ notification:Notification) {
+        if bottomTextField.isFirstResponder {
             view.frame.origin.y -= getKeyboardHeight(notification)
+        }
+
         
     }
     
     @objc func keyboardWillHide(_ notification:Notification) {
-            view.frame.origin.y += getKeyboardHeight(notification)
+        if bottomTextField.isFirstResponder {
+            view.frame.origin.y = 0
+        }
     }
     
     func getKeyboardHeight(_ notification:Notification) -> CGFloat {
