@@ -100,7 +100,7 @@ class MemeEditor: UIViewController, UIImagePickerControllerDelegate,UINavigation
     }
     
     @IBAction func cancelAction(_ sender: Any) {
-        configuration()
+        defaultConfiguration()
     }
     
     
