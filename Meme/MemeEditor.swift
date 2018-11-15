@@ -36,18 +36,11 @@ class MemeEditor: UIViewController, UIImagePickerControllerDelegate,UINavigation
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-    
-        configureTextFields(topTextField,with: "TOP")
-        configureTextFields(bottomTextField, with: "BOTTOM")
-        
-        // Disable the Cancel Button
-        shareButton.isEnabled = false
-        cancelButton.isEnabled = false
-        imageViewer.image = nil
 
-    }
+        defaultConfiguration()
     
+    }
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
@@ -96,20 +89,18 @@ class MemeEditor: UIViewController, UIImagePickerControllerDelegate,UINavigation
         let controller = UIActivityViewController(activityItems: [memedImage!], applicationActivities: nil)
         
         controller.completionWithItemsHandler = {(activityType: UIActivity.ActivityType?, completed: Bool, returnedItems: [Any]?, error: Error?) in
-            if !completed {
-                // User canceled
-                print("User Cancelled...!")
-            }
             // User completed activity
-            self.memedImage = self.generateMemedImage()
-            self.save()
-            self.dismiss(animated: true, completion: nil)
+            if completed{
+                //self.memedImage = self.generateMemedImage()
+                self.save()
+            }
+            //self.dismiss(animated: true, completion: nil)
         }
         self.present(controller, animated: true, completion: nil)
     }
     
     @IBAction func cancelAction(_ sender: Any) {
-        viewDidLoad()
+        configuration()
     }
     
     
@@ -143,6 +134,21 @@ class MemeEditor: UIViewController, UIImagePickerControllerDelegate,UINavigation
         textField.isUserInteractionEnabled = false
         }
     
+    func toolbarState(hiddenBar:Bool){
+        toolBar.isHidden = hiddenBar
+        navigationBar.isHidden = hiddenBar
+    }
+    
+    func defaultConfiguration(){
+        configureTextFields(topTextField,with: "TOP")
+        configureTextFields(bottomTextField, with: "BOTTOM")
+        
+        // Disable the Cancel Button
+        shareButton.isEnabled = false
+        cancelButton.isEnabled = false
+        imageViewer.image = nil
+    }
+    
     // #MARK Following code dealing with the Image
     
     // This func is to Save the image.
@@ -151,12 +157,10 @@ class MemeEditor: UIViewController, UIImagePickerControllerDelegate,UINavigation
         let meme = Meme(topTextField: topTextField.text!, bottomTextField: bottomTextField.text!, originalImage: imageViewer.image!, memedImage: memedImage)
     }
     
-    
     // This func is to modify the image
     func generateMemedImage() -> UIImage {
         //  Hide toolbar and navbar
-        toolBar.isHidden = true
-        navigationBar.isHidden = true
+        toolbarState(hiddenBar: true)
         // Render view to an image
         UIGraphicsBeginImageContext(self.view.frame.size)
         view.drawHierarchy(in: self.view.frame, afterScreenUpdates: true)
@@ -164,8 +168,8 @@ class MemeEditor: UIViewController, UIImagePickerControllerDelegate,UINavigation
         UIGraphicsEndImageContext()
         
         //Show toolbar and navbar
-        toolBar.isHidden = false
-        navigationBar.isHidden = false
+        toolbarState(hiddenBar: false)
+
 
         return memedImage
     }
