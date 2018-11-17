@@ -8,7 +8,7 @@
 
 import UIKit
 
-class MemeEditor: UIViewController, UIImagePickerControllerDelegate,UINavigationControllerDelegate,UITextFieldDelegate {
+class MemeEditor: UIViewController {
 
     // define buttons, image , .. etc
     @IBOutlet weak var imageViewer: UIImageView!
@@ -91,10 +91,8 @@ class MemeEditor: UIViewController, UIImagePickerControllerDelegate,UINavigation
         controller.completionWithItemsHandler = {(activityType: UIActivity.ActivityType?, completed: Bool, returnedItems: [Any]?, error: Error?) in
             // User completed activity
             if completed{
-                //self.memedImage = self.generateMemedImage()
                 self.save()
             }
-            //self.dismiss(animated: true, completion: nil)
         }
         self.present(controller, animated: true, completion: nil)
     }
@@ -105,15 +103,7 @@ class MemeEditor: UIViewController, UIImagePickerControllerDelegate,UINavigation
     
     
     // Picker Controller to save the choosing image
-    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-        if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
-            imageViewer.contentMode = .scaleAspectFit
-            imageViewer.image = image
-        }
-        dismiss(animated: true,completion: nil)
-        topTextField.isUserInteractionEnabled = true
-        bottomTextField.isUserInteractionEnabled = true
-    }
+
     
     // 
     func imagePicker (sourceType: UIImagePickerController.SourceType){
@@ -173,28 +163,9 @@ class MemeEditor: UIViewController, UIImagePickerControllerDelegate,UINavigation
 
         return memedImage
     }
-    
-    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-        dismiss(animated: true, completion: nil)
-    }
-    
-    
-    
-    
+
     //# MARK: following are textFields Delegates
     
-    func textFieldDidBeginEditing(_ textField: UITextField) {
-        if textField == topTextField {
-            topTextField.text = ""
-        }else {
-            bottomTextField.text = ""
-        }
-    }
-    
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
-        return false
-    }
     
     @objc func keyboardWillShow(_ notification:Notification) {
         if bottomTextField.isFirstResponder {
@@ -231,6 +202,39 @@ class MemeEditor: UIViewController, UIImagePickerControllerDelegate,UINavigation
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
     }
 
-    
+
 }
 
+extension MemeEditor: UITextFieldDelegate {
+    
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        if textField == topTextField {
+            topTextField.text = ""
+        }else {
+            bottomTextField.text = ""
+        }
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return false
+    }
+}
+
+extension MemeEditor: UIImagePickerControllerDelegate,UINavigationControllerDelegate{
+    
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        if let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage {
+            imageViewer.contentMode = .scaleAspectFit
+            imageViewer.image = image
+        }
+        dismiss(animated: true,completion: nil)
+        topTextField.isUserInteractionEnabled = true
+        bottomTextField.isUserInteractionEnabled = true
+    }
+    
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        dismiss(animated: true, completion: nil)
+    }
+    
+}
